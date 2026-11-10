@@ -32,6 +32,52 @@ local function palette()
     hl(0, "DiagnosticVirtualTextHint", { fg = "#6a6f78", bg = "#101014" })
     hl(0, "DiagnosticUnderlineError", { undercurl = true, sp = "#e06c75" })
     hl(0, "DiagnosticUnderlineWarn", { undercurl = true, sp = "#e5c07b" })
+
+    -- Fenced code in Markdown is parsed by its own language, whose groups
+    -- also need to fall back to the generic names the colorscheme defines.
+    for _, lang in ipairs({ "c", "lua", "query", "vim" }) do
+        local query = vim.treesitter.query.get(lang, "highlights")
+        if query then
+            for _, name in ipairs(query.captures) do
+                if name:sub(1, 1) ~= "_" then
+                    hl(0, "@" .. name .. "." .. lang, { link = "@" .. name })
+                end
+            end
+        end
+    end
+
+    -- Neovim's Treesitter highlighter appends the language to capture names,
+    -- so Markdown needs the language-specific groups, not just the parents.
+    local function markdown(name, opts)
+        hl(0, "@" .. name, opts)
+        hl(0, "@" .. name .. ".markdown", opts)
+        hl(0, "@" .. name .. ".markdown_inline", opts)
+    end
+
+    markdown("markup.heading", { fg = "#6ea8fe", bold = true })
+    markdown("markup.heading.1", { fg = "#6ea8fe", bold = true })
+    markdown("markup.heading.2", { fg = "#56b6c2", bold = true })
+    markdown("markup.heading.3", { fg = "#e5c07b", bold = true })
+    markdown("markup.heading.4", { fg = "#98c379", bold = true })
+    markdown("markup.heading.5", { fg = "#c678dd", bold = true })
+    markdown("markup.heading.6", { fg = "#abb2bf", bold = true })
+    markdown("markup.strong", { bold = true })
+    markdown("markup.italic", { italic = true })
+    markdown("markup.strikethrough", { strikethrough = true })
+    markdown("markup.raw", { fg = "#e5c07b", bg = "#181a1f" })
+    markdown("markup.raw.block", { bg = "#181a1f" })
+    markdown("markup.link", { fg = "#56b6c2" })
+    markdown("markup.link.label", { fg = "#56b6c2" })
+    markdown("markup.link.url", { fg = "#6ea8fe", underline = true })
+    markdown("markup.list", { fg = "#e5c07b" })
+    markdown("markup.list.checked", { fg = "#98c379" })
+    markdown("markup.list.unchecked", { fg = "#8a8f98" })
+    markdown("markup.quote", { fg = "#8a8f98" })
+    markdown("punctuation.special", { fg = "#6a6f78" })
+    markdown("punctuation.delimiter", { fg = "#6a6f78" })
+    markdown("label", { fg = "#c678dd" })
+    markdown("keyword.directive", { fg = "#c678dd" })
+    markdown("string.escape", { fg = "#e06c75" })
 end
 
 local function options()
@@ -210,6 +256,15 @@ local function autocmds()
             vim.bo.expandtab = true
             vim.bo.shiftwidth = 4
             vim.bo.tabstop = 4
+        end,
+    })
+
+    vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function()
+            vim.opt_local.wrap = true
+            vim.opt_local.linebreak = true
+            vim.opt_local.breakindent = true
         end,
     })
 end
