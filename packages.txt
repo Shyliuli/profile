@@ -1,0 +1,40 @@
+# Packages the profile needs, one per line. install.sh reads this file, so it
+# is the single list: add a package here and rerun the script.
+
+# ---- session
+sway                # the compositor
+swaybg              # solid-colour background for `output bg`
+swayidle            # panel-off / lock ladder
+swaylock            # screen lock
+
+# ---- terminal
+kitty               # default terminal; speaks the kitty graphics protocol
+foot                # fallback terminal, CPU rendering, lighter
+
+# ---- editor
+neovim              # the editor and the language client
+vim                 # fallback with the same syntax and keymaps
+
+# ---- launcher and search
+fuzzel              # application launcher behind Mod+d
+fzf                 # fuzzy finder behind C-f / C-p
+ripgrep             # workspace search behind C-f / C-g
+fd                  # file list for fzf
+bat                 # preview with syntax colour
+eza                 # ls replacement used by the shell
+lf                  # terminal file manager
+
+# ---- screenshots
+grim                # captures the screen
+slurp               # draws the region to capture
+wl-clipboard        # wl-copy / wl-paste, also Neovim's clipboard
+
+# ---- hardware and helpers
+brightnessctl       # display brightness keys
+jq                  # workspace script and picker results
+curl                # AI completion requests
+zstd                # archive support for x
+unzip               # archive support for x
+7zip                # archive support for x
+unrar               # archive support for x
+firefox             # the only GUI application the profile relies on

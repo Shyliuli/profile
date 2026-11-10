@@ -1,0 +1,48 @@
+" ShyProject coding profile — plain Vim 9 fallback.
+"
+" Neovim is the editor the profile standardises on; this file exists so that
+" `vim` still behaves the same way: relative numbers, arrows, Ctrl+S, the same
+" ShyC syntax. It has no language server and no AI completion.
+
+set nocompatible
+set number
+set relativenumber
+set numberwidth=3
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set smartindent
+set mouse=a
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+set hidden
+set scrolloff=6
+set swapfile
+set nobackup
+set statusline=%f%m\ %=\ %{&filetype}\ \ %l:%c\ %P
+
+syntax on
+filetype plugin indent on
+
+" Same filetypes as the Neovim profile.
+autocmd BufRead,BufNewFile *.shyc,*.shyh setfiletype shyc
+autocmd BufRead,BufNewFile *.shy setfiletype shyasm
+
+" Ctrl+S saves; Ctrl+Z / Ctrl+Y undo and redo. The shell sets -ixon so Ctrl+S
+" is not eaten by flow control.
+noremap  <C-s> :write<CR>
+inoremap <C-s> <C-o>:write<CR>
+vnoremap <C-s> <Esc>:write<CR>
+nnoremap <C-z> u
+nnoremap <C-y> <C-r>
+
+" File search without plugins: :find matches recursively, wildmenu completes.
+set path+=**
+set wildmenu
+set wildignore+=*/target/*,*.o,*.a,*.so
+
+" ShyC code style.
+autocmd FileType shyc,shyasm setlocal commentstring=//\ %s

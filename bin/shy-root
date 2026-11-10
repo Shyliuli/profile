@@ -1,0 +1,41 @@
+#!/bin/sh
+# shy-root — the directory Ctrl+f / Ctrl+Shift+F should search.
+#
+#   $SHY_SEARCH_ROOT   explicit override, used as-is
+#   focused window     its deepest child's working directory (the shell, not
+#                      the terminal process, so `cd` is respected)
+#   git root           when that directory is inside a repository
+#
+# It has to run *before* the picker window opens: once the picker exists it is
+# the focused window and its own directory would win.
+
+set -u
+
+[ -n "${SHY_SEARCH_ROOT:-}" ] && { printf '%s\n' "$SHY_SEARCH_ROOT"; exit 0; }
+
+# The shell inside the terminal is what tracks `cd`; kitty's own cwd is only
+# where kitty was launched. Look at the window's children first, then the
+# window itself.
+cwd_of_window() {
+    for p in $(pgrep -P "$1" 2>/dev/null) "$1"; do
+        case $(cat "/proc/$p/comm" 2>/dev/null) in
+            sh|bash|zsh|fish|dash|ksh|nvim|vim|hx|vi)
+                cwd=$(readlink "/proc/$p/cwd" 2>/dev/null) && [ -d "$cwd" ] && {
+                    printf '%s\n' "$cwd"
+                    return 0
+                }
+                ;;
+        esac
+    done
+    return 1
+}
+
+base=""
+pid=$(swaymsg -r -t get_tree 2>/dev/null \
+    | jq -r '.. | objects | select(.type? == "con" and .focused? == true) | .pid // empty' 2>/dev/null \
+    | head -1)
+[ -n "$pid" ] && base=$(cwd_of_window "$pid")
+[ -n "$base" ] || base=$PWD
+
+gitroot=$(git -C "$base" rev-parse --show-toplevel 2>/dev/null)
+printf '%s\n' "${gitroot:-$base}"

@@ -1,0 +1,38 @@
+#!/bin/sh
+# ai — the coding agent, whichever one SHY_AGENT names.
+#
+#   ai                     start the default agent
+#   ai -a codex            start another agent for one run
+#   ai "fix the parser"    one-shot question
+#
+# Codex is the default; crush is the lightest of the agents measured on
+# this machine (a single Go binary, ~0.4 s of CPU and ~100 MB per turn) but
+# codex is the more familiar agent (Rust, ~1.5 s / 330 MB). dsh and claude
+# work the same way through this wrapper.
+#
+# The editor calls the same wrapper from a terminal split, so the agent is
+# available in the shell, in vim/neovim and in emacs without any of them
+# knowing which agent it is.
+
+# GUI-launched editors may not inherit the interactive shell's environment.
+if [ -r "$HOME/.config/shy-code/llm.env" ]; then
+    set -a
+    . "$HOME/.config/shy-code/llm.env"
+    set +a
+fi
+
+agent=${SHY_AGENT:-codex}
+
+case ${1-} in
+    -a|--agent)
+        agent=$2
+        shift 2
+        ;;
+esac
+
+# DSH's Messages API has a different root from chat completions.
+if [ "$agent" = dsh ] && [ "${DEEPSEEK_BASE_URL:-}" = "https://api.deepseek.com" ]; then
+    unset DEEPSEEK_BASE_URL
+fi
+
+exec "$agent" "$@"

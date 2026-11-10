@@ -1,0 +1,28 @@
+#!/bin/sh
+# Ctrl+f anywhere: fuzzy file search in a floating kitty window.
+#
+# The picker is a normal terminal running fzf, so it costs one short-lived foot
+# and nothing else. Choosing a file opens it in a tiled foot running Neovim.
+# swaymsg is used so the editor window is not a child of the picker: closing
+# the picker must not close the editor.
+
+set -u
+
+# The binding passes the directory to search (see bin/shy-root); fall back to
+# the current directory when run by hand.
+dir=${1:-$(pwd)}
+[ -n "${SHY_SEARCH_ROOT:-}" ] && dir=$SHY_SEARCH_ROOT
+cd "$dir" || exit 1
+
+preview="bat --color=always --style=numbers --line-range=:80 -- {}"
+command -v bat >/dev/null 2>&1 || preview="sed -n '1,80p' -- {}"
+
+sel=$(
+    fd --type f --hidden --follow \
+        --exclude .git --exclude target --exclude node_modules \
+    | fzf --height=100% --reverse --no-info --prompt='file> ' \
+          --preview "$preview" --preview-window 'right,60%,border-left'
+)
+
+[ -n "$sel" ] || exit 0
+swaymsg exec -- kitty -e nvim -- "$dir/$sel"

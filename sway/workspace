@@ -1,0 +1,17 @@
+#!/bin/sh
+# Switch to, or move the focused window to, an adjacent numbered workspace.
+current=$(swaymsg -r -t get_workspaces | jq -r '.[] | select(.focused) | .num')
+[ "$current" -ge 1 ] 2>/dev/null || current=1
+
+case "$1" in
+    left) target=$((current - 1)) ;;
+    right) target=$((current + 1)) ;;
+    *) exit 1 ;;
+esac
+[ "$target" -ge 1 ] || exit 0
+
+if [ "${2:-}" = move ]; then
+    swaymsg -q "move container to workspace number $target"
+else
+    swaymsg -q "workspace number $target"
+fi

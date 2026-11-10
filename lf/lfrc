@@ -1,0 +1,25 @@
+# lf — terminal file manager for the profile.
+#
+# Arrow keys, Enter, e to edit, x to extract. No preview daemon, no icons, no
+# sixel: the file manager must not cost more than the editor.
+
+set hidden
+set drawbox true
+set icons false
+set period 5
+set info size:time
+set mouse true
+
+map q quit
+map <C-c> quit
+map e $$nvim "$f"
+map E $$nvim "$f"
+
+# Extraction goes through the same script the shell uses.
+cmd extract ${{
+    set -f
+    for f in $fx; do
+        shy-extract "$f"
+    done
+}}
+map x extract

@@ -1,0 +1,32 @@
+#!/bin/sh
+# shy-extract — one extractor for every archive the terminal meets.
+#
+# Used as `x ARCHIVE...` from the shell and as `x` inside lf. One case per
+# format beats remembering six different flags.
+
+set -u
+
+[ $# -ge 1 ] || { echo "usage: x ARCHIVE..." >&2; exit 2; }
+
+extract_one() {
+    case $1 in
+        *.tar.zst|*.tzst)  tar --zstd -xf "$1" ;;
+        *.tar.xz|*.txz)    tar -xJf "$1" ;;
+        *.tar.gz|*.tgz)    tar -xzf "$1" ;;
+        *.tar.bz2|*.tbz2)  tar -xjf "$1" ;;
+        *.tar)             tar -xf "$1" ;;
+        *.zip)             unzip -q "$1" ;;
+        *.7z)              7z x -y -bsp0 "$1" ;;
+        *.rar)             unrar x -o+ "$1" ;;
+        *.gz)              gzip -dk "$1" ;;
+        *.xz)              xz -dk "$1" ;;
+        *.zst)             zstd -d "$1" ;;
+        *)                 echo "x: no extractor for $1" >&2; return 1 ;;
+    esac
+}
+
+for f in "$@"; do
+    [ -f "$f" ] || { echo "x: not a file: $f" >&2; continue; }
+    echo "==> $f"
+    extract_one "$f" || exit 1
+done

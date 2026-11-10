@@ -1,0 +1,25 @@
+#!/bin/sh
+# swaybar status line: a clock that is accurate to the minute and nothing finer.
+#
+# The whole point is the sleep: one wakeup per minute, aligned to the second
+# boundary. A seconds clock would wake the CPU 1440 times a day more for no
+# information this profile wants. Nothing else in the bar updates faster than
+# the battery, which changes far slower than a minute.
+
+battery=/sys/class/power_supply/BAT0
+
+battery_text() {
+    [ -r "$battery/capacity" ] || return 0
+    level=$(cat "$battery/capacity")
+    case $(cat "$battery/status" 2>/dev/null) in
+        Charging) mark="+" ;;
+        Full)     mark="=" ;;
+        *)        mark="" ;;
+    esac
+    printf '%s%s%%' "$mark" "$level"
+}
+
+while :; do
+    printf '%s  %s\n' "$(date +%H:%M)" "$(battery_text)"
+    sleep "$((60 - $(date +%S)))"
+done

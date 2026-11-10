@@ -1,0 +1,139 @@
+# ShyProject coding profile — sway
+#
+# Power is the first constraint in this file:
+#   * no compositor effects, no background applets, a solid-colour background;
+#   * the bar wakes once a minute and the clock shows minutes only (no seconds);
+#   * the idle ladder turns the panel off at 5 min and locks at 10 min.
+# Anything that wants a once-a-second redraw does not belong here.
+
+set $mod Mod4
+set $term kitty
+
+# ---------------------------------------------------------------- shortcuts
+# The seven bindings the profile is built around. Ctrl is the modifier on
+# purpose: the editor config in this profile never uses Ctrl+f, Ctrl+Shift+f
+# or Ctrl+x for itself, so the apps lose nothing. Ctrl+Shift+c / Ctrl+Shift+v
+# stay with foot and Firefox, which do copy and paste themselves — binding
+# them here would take the keys away from the terminal.
+bindsym Control+Mod1+t             exec $term
+bindsym Control+Mod1+Left          exec sh ~/.config/sway/workspace left
+bindsym Control+Mod1+Right         exec sh ~/.config/sway/workspace right
+bindsym Control+Shift+Left         exec sh ~/.config/sway/workspace left move
+bindsym Control+Shift+Right        exec sh ~/.config/sway/workspace right move
+bindsym Control+f                  exec --no-startup-id kitty --class shy-picker -e ~/.local/bin/shy-find "$(~/.local/bin/shy-root)"
+bindsym Control+Shift+F            exec --no-startup-id kitty --class shy-picker -e ~/.local/bin/shy-grep "$(~/.local/bin/shy-root)"
+bindsym Control+Shift+X            kill
+
+# ------------------------------------------------------------------- essentials
+bindsym $mod+Return                exec $term
+bindsym $mod+r                     exec fuzzel
+bindsym $mod+Shift+R               reload
+bindsym $mod+Shift+E               exec swaynag -t warning -m 'Exit sway?' -B 'Yes' 'swaymsg exit'
+bindsym $mod+Escape                exec swaylock -f -c 101014
+# Screenshot: slurp draws the region, grim captures it, wl-copy holds it.
+bindsym Control+Shift+P            exec grim -g "$(slurp)" - | wl-copy
+
+# Focus, move, resize. Arrows again: nothing here needs hjkl.
+bindsym $mod+Left                   focus left
+bindsym $mod+Right                  focus right
+bindsym $mod+Up                     focus up
+bindsym $mod+Down                   focus down
+bindsym $mod+Shift+Left             move left
+bindsym $mod+Shift+Right            move right
+bindsym $mod+Shift+Up               move up
+bindsym $mod+Shift+Down             move down
+
+# The divider follows the arrow key regardless of which side the focused
+# window sits on; see bin/shy-resize.
+bindsym $mod+Control+Up             exec ~/.local/bin/shy-resize up
+bindsym $mod+Control+Down           exec ~/.local/bin/shy-resize down
+bindsym $mod+Control+Left           exec ~/.local/bin/shy-resize left
+bindsym $mod+Control+Right          exec ~/.local/bin/shy-resize right
+
+# Mouse: Mod+drag moves a tiled window around the tree, Mod+right-drag resizes,
+# Mod+middle click floats it.
+bindsym --whole-window $mod+button1 move
+bindsym --whole-window $mod+button3 resize
+bindsym --whole-window $mod+button2 floating toggle
+
+# Window arrangement. sway's tree is still a tree: these choose the split
+# direction or the layout for the focused container.
+bindsym $mod+b                      layout splith
+bindsym $mod+v                      layout splitv
+bindsym $mod+w                      layout tabbed
+bindsym $mod+s                      layout stacking
+bindsym $mod+e                      layout toggle split
+
+# Volume and brightness: wpctl and brightnessctl are part of the profile.
+bindsym XF86AudioRaiseVolume       exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+bindsym XF86AudioLowerVolume       exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym XF86AudioMute              exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym XF86MonBrightnessUp        exec brightnessctl set 5%+
+bindsym XF86MonBrightnessDown      exec brightnessctl set 5%-
+
+# -------------------------------------------------------------------- behaviour
+# New windows open below the focused one instead of beside it, which suits a
+# 16:10 laptop screen and stops the horizontal squeezing. Tabbed is one key
+# away (Mod+w) when you want it.
+default_orientation vertical
+default_border pixel 2
+default_floating_border pixel 2
+focus_follows_mouse no
+mouse_warping output
+
+# Popups from the picker scripts are floating panels, not tiled windows.
+# kitty sets the Wayland app id from --class, so this rule covers it.
+for_window [app_id="shy-picker"] floating enable, resize set 900 560, move position center
+
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+    dwt enabled
+}
+
+input type:keyboard {
+    repeat_delay 300
+    repeat_rate 40
+    xkb_layout cn
+}
+
+output * bg #101014 solid_color
+# Scale the 2560×1600 laptop panel; leave external displays at their own scale.
+output eDP-1 scale 1.5
+
+# XWayland stays enabled so KDE and Electron apps keep working; it idles at no
+# measurable cost. If everything you run is Wayland-native, `xwayland disable`
+# saves a little memory and one extra process.
+#xwayland disable
+
+# ------------------------------------------------------------------------- bar
+bar {
+    swaybar_command swaybar
+    status_command ~/.local/bin/shybar
+    position top
+    height 22
+    font "DejaVu Sans Mono 9"
+    workspace_buttons yes
+    tray_output none
+
+    colors {
+        background          #101014
+        statusline          #8a8f98
+        separator           #23262c
+        focused_workspace   #101014 #6ea8fe #101014
+        active_workspace    #101014 #23262c #d0d2d6
+        inactive_workspace  #101014 #101014 #5a5f68
+        urgent_workspace    #101014 #e06c75 #101014
+    }
+}
+
+# --------------------------------------------------------------------- startup
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
+exec systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
+exec fcitx5 -d --replace
+
+# Panel off after 5 minutes, lock after 10, lock before sleeping.
+exec swayidle -w \
+    timeout 300 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+    timeout 600 'swaylock -f -c 101014' \
+    before-sleep 'swaylock -f -c 101014'

@@ -1,0 +1,32 @@
+#!/bin/sh
+# Ctrl+Shift+F anywhere: live workspace search in a floating kitty window.
+#
+# ripgrep re-runs on every keystroke fzf reports; the 0.05 s sleep folds a
+# burst of keystrokes into one ripgrep run. The result list is file:line:col:text.
+
+set -u
+
+# The binding passes the directory to search (see bin/shy-root); fall back to
+# the current directory when run by hand.
+dir=${1:-$(pwd)}
+[ -n "${SHY_SEARCH_ROOT:-}" ] && dir=$SHY_SEARCH_ROOT
+cd "$dir" || exit 1
+
+sel=$(
+    fzf --height=100% --reverse --no-info --disabled --prompt='rg> ' \
+        --bind 'change:reload:sleep 0.05; rg --vimgrep --smart-case --no-messages -- {q} || true' \
+        --delimiter : --nth 1,2 \
+        --preview 'bat --color=always --style=numbers --highlight-line {2} -- {1}' \
+        --preview-window 'right,60%,border-left'
+)
+
+[ -n "$sel" ] || exit 0
+
+file=${sel%%:*}
+rest=${sel#*:}
+line=${rest%%:*}
+case $line in
+    ''|*[!0-9]*) line=1 ;;
+esac
+
+swaymsg exec -- kitty -e nvim +"$line" -- "$dir/$file"
