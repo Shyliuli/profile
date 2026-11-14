@@ -1,5 +1,5 @@
 #!/bin/sh
-# Ctrl+Shift+F anywhere: live workspace search in a floating kitty window.
+# Live workspace search in a floating kitty window.
 #
 # ripgrep re-runs on every keystroke fzf reports; the 0.05 s sleep folds a
 # burst of keystrokes into one ripgrep run. The result list is file:line:col:text.

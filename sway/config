@@ -10,18 +10,14 @@ set $mod Mod4
 set $term kitty
 
 # ---------------------------------------------------------------- shortcuts
-# The seven bindings the profile is built around. Ctrl is the modifier on
-# purpose: the editor config in this profile never uses Ctrl+f, Ctrl+Shift+f
-# or Ctrl+x for itself, so the apps lose nothing. Ctrl+Shift+c / Ctrl+Shift+v
-# stay with foot and Firefox, which do copy and paste themselves — binding
-# them here would take the keys away from the terminal.
+# Ctrl is the modifier on purpose. Ctrl+Shift+c / Ctrl+Shift+v stay with foot
+# and Firefox, which do copy and paste themselves — binding them here would
+# take the keys away from the terminal.
 bindsym Control+Mod1+t             exec $term
 bindsym Control+Mod1+Left          exec sh ~/.config/sway/workspace left
 bindsym Control+Mod1+Right         exec sh ~/.config/sway/workspace right
 bindsym Control+Shift+Left         exec sh ~/.config/sway/workspace left move
 bindsym Control+Shift+Right        exec sh ~/.config/sway/workspace right move
-bindsym Control+f                  exec --no-startup-id kitty --class shy-picker -e ~/.local/bin/shy-find "$(~/.local/bin/shy-root)"
-bindsym Control+Shift+F            exec --no-startup-id kitty --class shy-picker -e ~/.local/bin/shy-grep "$(~/.local/bin/shy-root)"
 bindsym Control+Shift+X            kill
 
 # ------------------------------------------------------------------- essentials

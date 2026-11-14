@@ -1,9 +1,9 @@
 -- The profile itself: options, palette, keys, language server, agent.
 --
--- The keys below are chosen around one rule: sway owns Ctrl+f, Ctrl+Shift+f
--- and Ctrl+x, so the editor must not want them. Everything else stays close to
--- plain Vim, with arrow keys as first-class movement and arrow-key habits in
--- mind (no hjkl-only behaviour).
+-- The keys below are chosen around one rule: sway owns Ctrl+x, so the editor
+-- must not want it. Everything else stays close to plain Vim, with arrow keys
+-- as first-class movement and arrow-key habits in mind (no hjkl-only
+-- behaviour).
 
 local M = {}
 

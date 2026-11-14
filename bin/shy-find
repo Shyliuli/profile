@@ -1,5 +1,5 @@
 #!/bin/sh
-# Ctrl+f anywhere: fuzzy file search in a floating kitty window.
+# Fuzzy file search in a floating kitty window.
 #
 # The picker is a normal terminal running fzf, so it costs one short-lived foot
 # and nothing else. Choosing a file opens it in a tiled foot running Neovim.

@@ -35,8 +35,6 @@ sudo ./install.sh
 | `Ctrl+Shift+←/→` | 把窗口移到相邻工作区 |
 | `Ctrl+Alt+t` / `Mod+Return` | 终端 |
 | `Ctrl+Shift+X` | 关窗口 |
-| `Ctrl+f` | 文件搜索（浮动窗口里的 fzf） |
-| `Ctrl+Shift+F` | 工作区内容搜索 |
 | `Ctrl+Shift+c/v` | 终端里复制/粘贴（kitty 自己处理，sway 不绑） |
 | `Mod+r` | 应用启动器（fuzzel） |
 | `Mod+Shift+R` / `Mod+Escape` | 重载配置 / 锁屏 |
@@ -51,8 +49,7 @@ sudo ./install.sh
 `Mod` 是 Super。新窗口默认**上下切分**（`default_orientation vertical`），不会把旁边的
 窗口横向越挤越窄；要并排就 `Mod+b`，要标签就 `Mod+w`。
 内置屏幕 `eDP-1` 默认 1.5 倍缩放，可在 sway 配置中调整。
-`Ctrl+f`、`Ctrl+Shift+f`、`Ctrl+x` 是全局键，所以编辑器里刻意
-不用这几个键：搜索用 `Ctrl+p` / `Ctrl+g`，关窗用 `:q`。
+`Ctrl+x` 是全局关窗，所以编辑器里关窗用 `:q`。
 
 编辑器（Neovim，`vim` 也是它）：
 
@@ -159,10 +156,11 @@ Go 的 key 已实测可用（`codex -p go` 回话正常）。`/model` 里只有 
 
 ## 搜索、文件、解压
 
-- `Ctrl+f` / `Ctrl+Shift+F`：浮动 kitty 里的 fzf + fd / ripgrep，选中后在新窗口用
-  Neovim 打开（搜索窗口不会连带关掉编辑器）。搜索目录取**当前焦点终端里 shell 的
-  工作目录**，在该目录是 git 仓库时向上取仓库根；设 `SHY_SEARCH_ROOT` 可固定到一个
-  目录（见 `environment.d/90-shycode.conf`）。
+- `shy-find` / `shy-grep`：浮动 kitty 里的 fzf + fd / ripgrep，选中后在新窗口用
+  Neovim 打开（搜索窗口不会连带关掉编辑器）。手动运行时传入搜索目录，例如
+  `shy-find "$(shy-root)"`；搜索目录取**当前焦点终端里 shell 的工作目录**，在该目录
+  是 git 仓库时向上取仓库根；设 `SHY_SEARCH_ROOT` 可固定到一个目录（见
+  `environment.d/90-shycode.conf`）。
 - `lf`：终端文件管理器（方向键、`Enter` 打开、`e` 编辑、`x` 解压、`q` 退出）。
 - `x ARCHIVE...`：`bin/shy-extract`，覆盖 tar.{gz,xz,zst,bz2}、zip、7z、rar、gz、
   xz、zst。
@@ -173,9 +171,7 @@ Go 的 key 已实测可用（`codex -p go` 回话正常）。`/model` 里只有 
 
 ## 已知限制
 
-- `Ctrl+f` 抢走了终端的 readline 前移键，`Ctrl+x` 是全局关窗。编辑器里已避让；
-  如果你更想要 readline 行为，把 sway 配置里那三行 `Control+f` / `Control+x`
-  换到 `$mod` 上即可。
+- `Ctrl+x` 是全局关窗，编辑器里用 `:q`。
 - fcitx5 走 text-input-v3 / input-method-v2：sway 1.12 + wlroots 0.20 已提供
   `zwp_input_method_manager_v2`（`wayland-info` 实测），kitty 与 foot 都走 text-input，
   所以 Wayland 原生窗口（kitty、foot、Firefox）可直接输入；XWayland 应用靠

@@ -1,5 +1,5 @@
 #!/bin/sh
-# shy-root — the directory Ctrl+f / Ctrl+Shift+F should search.
+# shy-root — the directory searched by shy-find / shy-grep.
 #
 #   $SHY_SEARCH_ROOT   explicit override, used as-is
 #   focused window     its deepest child's working directory (the shell, not
