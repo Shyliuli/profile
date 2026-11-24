@@ -68,10 +68,9 @@ bindsym XF86MonBrightnessUp        exec brightnessctl set 5%+
 bindsym XF86MonBrightnessDown      exec brightnessctl set 5%-
 
 # -------------------------------------------------------------------- behaviour
-# New windows open below the focused one instead of beside it, which suits a
-# 16:10 laptop screen and stops the horizontal squeezing. Tabbed is one key
-# away (Mod+w) when you want it.
-default_orientation vertical
+# New windows open beside the focused one by default. Tabbed is one key away
+# (Mod+w) when you want it.
+default_orientation horizontal
 default_border pixel 2
 default_floating_border pixel 2
 focus_follows_mouse no
