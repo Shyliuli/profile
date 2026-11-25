@@ -94,6 +94,11 @@ echo "==> agent instructions"
 mkdir -p "$HOME/.codex"
 backup "$HOME/.codex/AGENTS.md"
 ln -sfn "$here/AGENTS.md" "$HOME/.codex/AGENTS.md"
+# Antigravity (IDE / CLI / App) reads global rules from ~/.gemini/config/AGENTS.md.
+mkdir -p "$HOME/.gemini/config"
+backup "$HOME/.gemini/config/AGENTS.md"
+ln -sfn "$here/AGENTS.md" "$HOME/.gemini/config/AGENTS.md"
+link "$here/skills/ask-llm" "$HOME/.codebuddy/skills/ask-llm"
 
 echo "==> agent"
 if command -v go >/dev/null 2>&1; then

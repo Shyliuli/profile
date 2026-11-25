@@ -1,0 +1,10 @@
+# 复制到 ~/.config/ask-llm/config.yaml，或设 ASK_LLM_CONFIG 指向本文件
+providers:
+  deepseek:
+    type: openai
+    base: https://api.deepseek.com
+    apikey: sk-xxx
+    model_list: []
+models:
+  deepseek/deepseek-chat:
+    desc: 通用对话

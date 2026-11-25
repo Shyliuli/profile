@@ -104,6 +104,10 @@ sudo ./install.sh
 
 默认 `codex`。`ai` 是统一包装器，编辑器里的 `:Agent` 和 shell 里都调它：
 
+`skills/ask-llm` 是给 agent 用的 LLM 问答技能，`install.sh` 链到
+`~/.codebuddy/skills/ask-llm`；配置在 `~/.config/ask-llm/config.yaml`，样例见
+`skills/ask-llm/config.example.yaml`。
+
 ```sh
 ai                      # 默认 agent（codex）
 ai -a crush             # 换一个跑一次
